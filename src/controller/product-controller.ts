@@ -7,16 +7,58 @@ export class ProductController {
     public getProducts = async (req: Request, res: Response) => {
         try {
             const q = req.query.q
-    
-            let output;
-    
+        
             if (q){
-                output = await db("products").select().where("name", "LIKE", `%${q}%`)
+                const productsDb = await db("products").select().where("name", "LIKE", `%${q}%`)
+                const brandsDb = await db("brands").select()
+
+                const getBrands = (brand_id: string) => {
+                    const brand = brandsDb.find((brand)=>{
+                        return brand.id === brand_id
+                    })
+
+                    return{
+                        id: brand_id,
+                        name: brand.name
+                    }
+                }
+
+                const output = productsDb.map((product) => {
+                    return {
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        brand: getBrands(product.cd_brand)
+                    }
+                })
+
+                res.status(200).send(output);
             } else {
-                output = await db("products").select()
+                const productsDb = await db("products").select()
+                const brandsDb = await db("brands").select() 
+
+                const getBrands = (brand_id:string) => {
+                    const brand = brandsDb.find((brand)=>{
+                        return brand.id === brand_id
+                    })
+
+                    return{
+                        id: brand_id,
+                        name: brand.name
+                    }
+                }
+
+                const output = productsDb.map((product) =>{
+                    return {
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        brand: getBrands(product.cd_brand), 
+                    }
+                })
+
+                res.status(200).send(output);
             }
-    
-            res.status(200).send(output);
     
         } catch (error) {
             if (error instanceof Error) {
