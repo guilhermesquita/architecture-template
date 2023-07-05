@@ -1,5 +1,4 @@
-import express, { Request, Response } from 'express'
-import { db } from '../database/baseDatabase';
+import express from 'express'
 import { ProductController } from '../controller/product-controller';
 
 export const productRouter = express.Router();
