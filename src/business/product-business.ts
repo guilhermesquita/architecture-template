@@ -1,10 +1,17 @@
-import { db } from "../database/baseDatabase"
+import { BrandDatabase } from "../database/brand-database"
+import { ProductDatabase } from "../database/product-database"
 
 export class ProductBusiness {
+
+    constructor(
+        private productDatabase: ProductDatabase,
+        private brandDatabase: BrandDatabase
+    ){}
+
     public getProducts = async (q: string | undefined) => {
         if (q){
-            const productsDb = await db("products").select().where("name", "LIKE", `%${q}%`)
-            const brandsDb = await db("brands").select()
+            const productsDb = await this.productDatabase.getAllProductsByName(q)
+            const brandsDb = await this.brandDatabase.getAllBrands()
 
             const getBrands = (brand_id: string) => {
                 const brand = brandsDb.find((brand)=>{
@@ -28,9 +35,9 @@ export class ProductBusiness {
 
             return output;
         } else {
-            const productsDb = await db("products").select()
-            const brandsDb = await db("brands").select() 
-
+            const productsDb = await this.productDatabase.getAllProducts()
+            const brandsDb = await this.brandDatabase.getAllBrands()
+            
             const getBrands = (brand_id:string) => {
                 const brand = brandsDb.find((brand)=>{
                     return brand.id === brand_id
